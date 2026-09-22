@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>小學數學－異分母加法挑戰</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* iPad 橫向容器 */
+        .game-container {
+            width: 95vw;
+            max-width: 1024px;
+            height: 92vh;
+            max-height: 720px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 32px;
+            position: relative;
+        }
+
+        /* 頂部資訊欄 */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 3px solid #f1f5f9;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-menu {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(100, 116, 139, 0.2);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-menu:active {
+            transform: scale(0.95);
+            background: #475569;
+        }
+
+        .level-badge {
+            background: #0284c7;
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .progress-info {
+            display: flex;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-box span {
+            color: #0284c7;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .stat-box.penalty span { color: #e11d48; }
+        .stat-box.score-box span { color: #d97706; }
+        .stat-box.timer-box span { color: #059669; }
+
+        /* 題目主區域 */
+        .main-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .question-title {
+            font-size: 24px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* 分數渲染 */
+        .formula-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .fraction {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .whole-num {
+            font-size: 44px;
+            font-weight: bold;
+        }
+
+        .frac-stack {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+        }
+
+        .num, .den {
+            font-size: 30px;
+            font-weight: bold;
+            line-height: 1.1;
+            padding: 0 4px;
+        }
+
+        .frac-line {
+            width: 100%;
+            height: 3px;
+            background-color: #1e293b;
+            margin: 3px 0;
+            border-radius: 2px;
+        }
+
+        .operator {
+            font-size: 40px;
+            color: #0284c7;
+            margin: 0 8px;
+        }
+
+        /* 作答輸入區 */
+        .answer-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #f0f9ff;
+            padding: 20px 40px;
+            border-radius: 20px;
+            border: 2px dashed #38bdf8;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            height: 65px;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid #94a3b8;
+            border-radius: 12px;
+            outline: none;
+            background: #ffffff;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2);
+        }
+
+        .input-line-divider {
+            width: 80px;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            margin: 2px 0;
+        }
+
+        /* 按鈕與提示 */
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn-submit {
+            background: #0284c7;
+            color: white;
+            border: none;
+            width: 200px;
+            height: 56px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.96);
+            background: #0369a1;
+        }
+
+        .btn-hint {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            width: 130px;
+            height: 56px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .btn-hint:active {
+            transform: scale(0.96);
+            background: #d97706;
+        }
+
+        .hint-box {
+            background: #fffbe3;
+            border: 2px dashed #f59e0b;
+            color: #92400e;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            max-width: 650px;
+            text-align: center;
+        }
+
+        .feedback-msg {
+            height: 30px;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .msg-correct { color: #16a34a; }
+        .msg-wrong { color: #dc2626; }
+
+        /* Modal 彈窗樣式 */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: white;
+            width: 88%;
+            max-width: 800px;
+            max-height: 88%;
+            border-radius: 24px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 32px;
+            color: #0f172a;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* 模式選擇選單樣式 */
+        .btn-full-mode {
+            width: 100%;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3);
+            transition: transform 0.1s, background 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .btn-full-mode:active {
+            transform: scale(0.98);
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .btn-level-card {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 16px 20px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-level-card:hover {
+            border-color: #0284c7;
+            background: #f0f9ff;
+            transform: translateY(-2px);
+        }
+
+        .btn-level-card .lvl-num {
+            font-size: 22px;
+            font-weight: bold;
+            color: #0284c7;
+            margin-bottom: 4px;
+        }
+
+        .btn-level-card .lvl-desc {
+            font-size: 16px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* 統計與歷史紀錄表格 */
+        .summary-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .summary-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 16px;
+            text-align: center;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .summary-box .num {
+            font-size: 30px;
+            color: #0284c7;
+            font-weight: bold;
+        }
+
+        .summary-box .label {
+            font-size: 16px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 18px;
+        }
+
+        .history-table th, .history-table td {
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .history-table th {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .badge-retry {
+            background: #fef3c7;
+            color: #b45309;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .modal-btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-modal {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .btn-modal:active {
+            transform: scale(0.96);
+        }
+
+        .btn-modal.secondary {
+            background: #64748b;
+            box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- 頂部資訊欄 -->
+        <div class="header-bar">
+            <div class="header-left">
+                <button class="btn-menu" onclick="openStartModal()">☰ 主選單</button>
+                <div class="level-badge" id="levelBadge">關卡 1 / 4</div>
+            </div>
+            <div class="progress-info">
+                <div class="stat-box">首對目標：<span id="targetCount">0 / 10</span> 題</div>
+                <div class="stat-box penalty">答錯加題：<span id="penaltyCount">0</span> 題</div>
+                <div class="stat-box timer-box">⏱️ 時間：<span id="timerDisplay">00:00</span></div>
+                <div class="stat-box score-box">⭐ 得分：<span id="scoreDisplay">0</span></div>
+            </div>
+        </div>
+
+        <!-- 主答題區 -->
+        <div class="main-card">
+            <div class="question-title">請計算以下異分母分數加法（答案請化為最簡分數）：</div>
+
+            <div class="formula-display" id="formulaDisplay"></div>
+
+            <div class="answer-area">
+                <div class="input-group" style="justify-content: center;">
+                    <input type="number" id="inputW" inputmode="numeric">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="inputN" inputmode="numeric">
+                    <div class="input-line-divider"></div>
+                    <input type="number" id="inputD" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="action-area">
+                <div class="btn-group">
+                    <button class="btn-submit" id="btnSubmit" onclick="submitAnswer()">提交答案</button>
+                    <button class="btn-hint" id="btnHint" onclick="toggleHint()">💡 提示</button>
+                </div>
+                <div class="hint-box" id="hintBox" style="display: none;"></div>
+                <div class="feedback-msg msg-correct" id="feedbackMsg"></div>
+            </div>
+        </div>
+
+        <!-- 起始 / 模式選擇 Modal -->
+        <div class="modal-overlay active" id="startModal">
+            <div class="modal-card">
+                <div class="modal-title">🎮 異分母加法挑戰</div>
+                
+                <button class="btn-full-mode" onclick="startGame('full', 1)">
+                    🏆 連續過全關挑戰（第 1 至 4 關）
+                </button>
+
+                <div style="font-size: 20px; font-weight: bold; color: #475569; margin-bottom: 14px; width: 100%; text-align: left;">
+                    或 選擇指定關卡練習：
+                </div>
+
+                <div class="level-grid">
+                    <div class="btn-level-card" onclick="startGame('single', 1)">
+                        <div class="lvl-num">關卡 1 (目標 10 題)</div>
+                        <div class="lvl-desc">兩個真分數加法 (不進位)</div>
+                    </div>
+                    <div class="btn-level-card" onclick="startGame('single', 2)">
+                        <div class="lvl-num">關卡 2 (目標 10 題)</div>
+                        <div class="lvl-desc">帶分數加法 (含進位)</div>
+                    </div>
+                    <div class="btn-level-card" onclick="startGame('single', 3)">
+                        <div class="lvl-num">關卡 3 (目標 5 題)</div>
+                        <div class="lvl-desc">三個分數連加 (含1或2個帶分數)</div>
+                    </div>
+                    <div class="btn-level-card" onclick="startGame('single', 4)">
+                        <div class="lvl-num">關卡 4 (目標 5 題)</div>
+                        <div class="lvl-desc">三個分數連加 (含2或3個帶分數與進位)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 關卡小結算 Modal -->
+        <div class="modal-overlay" id="levelModal">
+            <div class="modal-card">
+                <div class="modal-title" id="levelModalTitle">🎉 關卡 1 完成！</div>
+                <div class="summary-stats">
+                    <div class="summary-box">
+                        <div class="num" id="lmFirstTry">0</div>
+                        <div class="label">首次答對題數</div>
+                    </div>
+                    <div class="summary-box">
+                        <div class="num" id="lmPenalties" style="color: #e11d48;">0</div>
+                        <div class="label">答錯加題次數</div>
+                    </div>
+                    <div class="summary-box">
+                        <div class="num" id="lmTotalScore" style="color: #d97706;">0</div>
+                        <div class="label">目前累計總分</div>
+                    </div>
+                </div>
+                <div class="modal-btn-group">
+                    <button class="btn-modal secondary" onclick="openStartModal()">返回選關</button>
+                    <button class="btn-modal secondary" style="background:#0284c7;" onclick="restartCurrentLevel()">再練一次</button>
+                    <button class="btn-modal" id="btnNextLevel" onclick="nextLevel()">進入下一關</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 全遊戲總結算 Modal -->
+        <div class="modal-overlay" id="finalModal">
+            <div class="modal-card">
+                <div class="modal-title">🏆 恭喜完成全部四關挑戰！</div>
+                <div class="summary-stats">
+                    <div class="summary-box">
+                        <div class="num" id="fmTotalFirstTry">0</div>
+                        <div class="label">總完成首對題數</div>
+                    </div>
+                    <div class="summary-box">
+                        <div class="num" id="fmTotalPenalties" style="color: #e11d48;">0</div>
+                        <div class="label">總答錯加題次數</div>
+                    </div>
+                    <div class="summary-box">
+                        <div class="num" id="fmTotalTime" style="color: #059669;">00:00</div>
+                        <div class="label">總共用時</div>
+                    </div>
+                    <div class="summary-box">
+                        <div class="num" id="fmFinalScore" style="color: #d97706;">0</div>
+                        <div class="label">最終總得分</div>
+                    </div>
+                </div>
+
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>關卡</th>
+                            <th>題目</th>
+                            <th>首次回答答案</th>
+                            <th>正確答案</th>
+                            <th>結果</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+
+                <button class="btn-modal" onclick="openStartModal()">返回主選單</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 基礎數學函式
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        function lcm(a, b) {
+            return (a * b) / gcd(a, b);
+        }
+
+        function lcmArray(arr) {
+            return arr.reduce((acc, val) => lcm(acc, val));
+        }
+
+        // 遊戲狀態變數
+        let gameMode = 'full'; // 'full' 通關模式, 'single' 單關模式
+        let currentLevel = 1;
+        let levelGoal = 10;
+        let levelFirstTryCount = 0;
+        let levelPenalties = 0;
+
+        let totalScore = 0;
+        let streakCount = 0;
+
+        let startTime = 0;
+        let timerInterval = null;
+        let totalElapsedSeconds = 0;
+
+        let currentQuestion = null;
+        let isFirstAttempt = true;
+        let currentFirstAnswerText = "";
+        let gameHistory = [];
+
+        function openStartModal() {
+            stopTimer();
+            document.getElementById('levelModal').classList.remove('active');
+            document.getElementById('finalModal').classList.remove('active');
+            document.getElementById('startModal').classList.add('active');
+        }
+
+        function startGame(mode, lvl) {
+            gameMode = mode;
+            currentLevel = lvl;
+            totalScore = 0;
+            streakCount = 0;
+            gameHistory = [];
+
+            document.getElementById('startModal').classList.remove('active');
+            document.getElementById('levelModal').classList.remove('active');
+            document.getElementById('finalModal').classList.remove('active');
+
+            startTimer();
+            startLevel(lvl);
+        }
+
+        /* 計時器邏輯 */
+        function startTimer() {
+            startTime = Date.now();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+
+        function updateTimerDisplay() {
+            totalElapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            let mins = Math.floor(totalElapsedSeconds / 60);
+            let secs = totalElapsedSeconds % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        function getFormattedTimeStr() {
+            let mins = Math.floor(totalElapsedSeconds / 60);
+            let secs = totalElapsedSeconds % 60;
+            return mins > 0 ? `${mins}分 ${secs}秒` : `${secs}秒`;
+        }
+
+        function startLevel(lvl) {
+            currentLevel = lvl;
+            // 第 1 關與第 2 關目標為 10 題，其餘關卡為 5 題
+            levelGoal = (lvl === 1 || lvl === 2) ? 10 : 5;
+            levelFirstTryCount = 0;
+            levelPenalties = 0;
+
+            updateHeader();
+            nextQuestion();
+        }
+
+        function restartCurrentLevel() {
+            document.getElementById('levelModal').classList.remove('active');
+            startLevel(currentLevel);
+        }
+
+        function updateHeader() {
+            let badgeText = gameMode === 'single' ? `關卡 ${currentLevel} (單關練習)` : `關卡 ${currentLevel} / 4`;
+            document.getElementById('levelBadge').innerText = badgeText;
+            document.getElementById('targetCount').innerText = `${levelFirstTryCount} / ${levelGoal}`;
+            document.getElementById('penaltyCount').innerText = `${levelPenalties}`;
+            document.getElementById('scoreDisplay').innerText = `${totalScore}`;
+        }
+
+        // 題目生成器
+        function generateQuestionData() {
+            let level = currentLevel;
+            let targetCheckCount = (level === 1 || level === 2) ? 6 : 3;
+            let isLastTwo = (levelFirstTryCount >= targetCheckCount);
+            let needCarryOver = (level === 2 || level === 4) && isLastTwo;
+
+            let bestCandidate = null;
+
+            for (let attempt = 0; attempt < 5000; attempt++) {
+                let terms = [];
+
+                if (level === 1) {
+                    let d1 = Math.floor(Math.random() * 10) + 2;
+                    let d2 = Math.floor(Math.random() * 10) + 2;
+                    if (d1 === d2) continue;
+                    
+                    let n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+                    let n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+
+                    if ((n1 / d1) + (n2 / d2) >= 1) continue;
+
+                    terms = [{ w: 0, n: n1, d: d1 }, { w: 0, n: n2, d: d2 }];
+                }
+                else if (level === 2) {
+                    let isTwoMixed = Math.random() < 0.5;
+                    let d1 = Math.floor(Math.random() * 12) + 2;
+                    let d2 = Math.floor(Math.random() * 12) + 2;
+                    if (d1 === d2) continue;
+
+                    let n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+                    let n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+
+                    let fracSum = (n1 / d1) + (n2 / d2);
+                    if (needCarryOver && fracSum < 1) continue;
+                    if (!needCarryOver && fracSum >= 1) continue;
+
+                    let w1 = 0, w2 = 0;
+                    if (isTwoMixed) {
+                        w1 = Math.floor(Math.random() * 2) + 1;
+                        w2 = Math.floor(Math.random() * 2) + 1;
+                    } else {
+                        if (Math.random() < 0.5) {
+                            w1 = Math.floor(Math.random() * 2) + 1;
+                            w2 = 0;
+                        } else {
+                            w1 = 0;
+                            w2 = Math.floor(Math.random() * 2) + 1;
+                        }
+                    }
+                    terms = [{ w: w1, n: n1, d: d1 }, { w: w2, n: n2, d: d2 }];
+                }
+                else if (level === 3) {
+                    // 第三關：三個分數連加（2個真分數+1個帶分數 或 1個真分數+2個帶分數）
+                    let d1 = Math.floor(Math.random() * 10) + 2;
+                    let d2 = Math.floor(Math.random() * 10) + 2;
+                    let d3 = Math.floor(Math.random() * 10) + 2;
+                    if (d1 === d2 && d2 === d3) continue;
+
+                    let n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+                    let n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+                    let n3 = Math.floor(Math.random() * (d3 - 1)) + 1;
+
+                    // 50% 機率為 1個帶分數 (2真+1帶)，50% 機率為 2個帶分數 (1真+2帶)
+                    let mixedCount = Math.random() < 0.5 ? 1 : 2;
+                    let wList = [0, 0, 0];
+                    for (let i = 0; i < mixedCount; i++) {
+                        wList[i] = Math.floor(Math.random() * 2) + 1;
+                    }
+                    wList.sort(() => Math.random() - 0.5); // 打亂位置
+
+                    terms = [
+                        { w: wList[0], n: n1, d: d1 },
+                        { w: wList[1], n: n2, d: d2 },
+                        { w: wList[2], n: n3, d: d3 }
+                    ];
+                }
+                else if (level === 4) {
+                    let d1 = Math.floor(Math.random() * 12) + 2;
+                    let d2 = Math.floor(Math.random() * 12) + 2;
+                    let d3 = Math.floor(Math.random() * 12) + 2;
+                    if (d1 === d2 && d2 === d3) continue;
+
+                    let n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+                    let n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+                    let n3 = Math.floor(Math.random() * (d3 - 1)) + 1;
+
+                    let fracSum = (n1 / d1) + (n2 / d2) + (n3 / d3);
+                    if (needCarryOver && fracSum < 1) continue;
+                    if (!needCarryOver && fracSum >= 1) continue;
+
+                    let mixedCount = Math.random() < 0.5 ? 2 : 3;
+                    let wList = [0, 0, 0];
+                    for (let i = 0; i < mixedCount; i++) {
+                        wList[i] = Math.floor(Math.random() * 2) + 1;
+                    }
+                    if (mixedCount === 2) {
+                        wList.sort(() => Math.random() - 0.5);
+                    }
+
+                    terms = [
+                        { w: wList[0], n: n1, d: d1 },
+                        { w: wList[1], n: n2, d: d2 },
+                        { w: wList[2], n: n3, d: d3 }
+                    ];
+                }
+
+                let denArr = terms.map(t => t.d);
+                let commonD = lcmArray(denArr);
+
+                if (commonD > 36) continue;
+
+                let totalN = 0;
+                terms.forEach(t => {
+                    let improperN = t.w * t.d + t.n;
+                    totalN += improperN * (commonD / t.d);
+                });
+
+                let g = gcd(totalN, commonD);
+                let simD = commonD / g;
+
+                if (simD > 20) continue;
+
+                bestCandidate = { terms, commonD, totalN, g };
+                break;
+            }
+
+            if (!bestCandidate) {
+                if (level === 1) {
+                    bestCandidate = { terms: [{w:0, n:1, d:4}, {w:0, n:1, d:3}], commonD: 12, totalN: 7, g: 1 };
+                } else if (level === 2) {
+                    bestCandidate = { terms: [{w:1, n:1, d:4}, {w:0, n:1, d:3}], commonD: 12, totalN: 19, g: 1 };
+                } else if (level === 3) {
+                    bestCandidate = { terms: [{w:1, n:1, d:6}, {w:0, n:1, d:4}, {w:0, n:1, d:3}], commonD: 12, totalN: 21, g: 3 };
+                } else if (level === 4) {
+                    bestCandidate = { terms: [{w:1, n:1, d:6}, {w:1, n:1, d:4}, {w:0, n:1, d:3}], commonD: 12, totalN: 33, g: 3 };
+                }
+            }
+
+            let commonD = bestCandidate.commonD;
+            let totalN = bestCandidate.totalN;
+            let g = bestCandidate.g;
+            let simN = totalN / g;
+            let simD = commonD / g;
+
+            let targetW = Math.floor(simN / simD);
+            let targetN = simN % simD;
+            let targetD = targetN === 0 ? 0 : simD;
+
+            return {
+                commonD: commonD,
+                terms: bestCandidate.terms,
+                target: { w: targetW, n: targetN, d: targetD }
+            };
+        }
+
+        function nextQuestion() {
+            currentQuestion = generateQuestionData();
+            isFirstAttempt = true;
+            currentFirstAnswerText = "";
+
+            document.getElementById('inputW').value = '';
+            document.getElementById('inputN').value = '';
+            document.getElementById('inputD').value = '';
+            document.getElementById('feedbackMsg').innerText = '';
+            document.getElementById('hintBox').style.display = 'none';
+            document.getElementById('hintBox').innerText = '';
+            document.getElementById('btnSubmit').disabled = false;
+
+            renderFormula();
+        }
+
+        function renderFormula() {
+            let container = document.getElementById('formulaDisplay');
+            container.innerHTML = '';
+
+            currentQuestion.terms.forEach((t, idx) => {
+                if (idx > 0) {
+                    let op = document.createElement('span');
+                    op.className = 'operator';
+                    op.innerText = '+';
+                    container.appendChild(op);
+                }
+
+                let fracDiv = document.createElement('div');
+                fracDiv.className = 'fraction';
+
+                if (t.w > 0) {
+                    let wSpan = document.createElement('span');
+                    wSpan.className = 'whole-num';
+                    wSpan.innerText = t.w;
+                    fracDiv.appendChild(wSpan);
+                }
+
+                let stackDiv = document.createElement('div');
+                stackDiv.className = 'frac-stack';
+                stackDiv.innerHTML = `
+                    <span class="num">${t.n}</span>
+                    <div class="frac-line"></div>
+                    <span class="den">${t.d}</span>
+                `;
+                fracDiv.appendChild(stackDiv);
+                container.appendChild(fracDiv);
+            });
+
+            let eq = document.createElement('span');
+            eq.className = 'operator';
+            eq.innerText = '=';
+            container.appendChild(eq);
+        }
+
+        function toggleHint() {
+            let hintBox = document.getElementById('hintBox');
+            if (hintBox.style.display === 'none' || hintBox.innerText === '') {
+                hintBox.innerText = generateHintText();
+                hintBox.style.display = 'block';
+            } else {
+                hintBox.style.display = 'none';
+            }
+        }
+
+        function generateHintText() {
+            let dens = currentQuestion.terms.map(t => t.d);
+            let maxD = Math.max(...dens);
+            let minD = Math.min(...dens);
+
+            if (dens.length === 2) {
+                let d1 = dens[0];
+                let d2 = dens[1];
+
+                if (d1 % d2 === 0 || d2 % d1 === 0) {
+                    return `💡 提示：觀察這兩個分母，較大的分母（${maxD}）剛好是較小分母（${minD}）的倍數，試著用較大的那個分母進行通分喔！`;
+                } else if (gcd(d1, d2) === 1) {
+                    return `💡 提示：這兩個分母（${d1} 和 ${d2}）除了 1 之外沒有其他公因數，試著把兩個分母直接相乘來尋找通分母喔！`;
+                } else {
+                    return `💡 提示：請試著分別寫出分母 ${d1} 和 ${d2} 的倍數，找出把它們通分的「最小公倍數」喔！`;
+                }
+            } else {
+                let isMultiple = dens.every(d => maxD % d === 0);
+                if (isMultiple) {
+                    return `💡 提示：觀察這三個分母，最大的分母（${maxD}）剛好是其他分母的倍數，試著用最大的分母來進行通分喔！`;
+                } else {
+                    return `💡 提示：請試著列出分母 ${dens.join('、')} 的倍數，找出同時是這三個數的「最小公倍數」來進行通分喔！`;
+                }
+            }
+        }
+
+        function formatFractionText(w, n, d) {
+            if (w > 0 && n > 0) return `${w} 又 ${n}/${d}`;
+            if (w > 0 && n === 0) return `${w}`;
+            if (w === 0 && n > 0) return `${n}/${d}`;
+            return "0";
+        }
+
+        function getQuestionText() {
+            return currentQuestion.terms.map(t => formatFractionText(t.w, t.n, t.d)).join(' + ');
+        }
+
+        function submitAnswer() {
+            let inputWVal = document.getElementById('inputW').value.trim();
+            let inputNVal = document.getElementById('inputN').value.trim();
+            let inputDVal = document.getElementById('inputD').value.trim();
+
+            let w = parseInt(inputWVal) || 0;
+            let n = parseInt(inputNVal) || 0;
+            let d = parseInt(inputDVal) || 0;
+
+            let currentAnsStr = formatFractionText(w, n, d);
+            if (isFirstAttempt) {
+                currentFirstAnswerText = currentAnsStr;
+            }
+
+            let validation = validateAnswer(w, n, d, currentQuestion.target);
+            let msgEl = document.getElementById('feedbackMsg');
+
+            if (validation.valid) {
+                streakCount++;
+                let bonus = (streakCount >= 2) ? 5 : 0;
+                let pointsGained = 20 + bonus;
+                totalScore += pointsGained;
+
+                let streakMsg = bonus > 0 ? ` (🔥 連對x${streakCount} 額外+5分)` : '';
+                msgEl.className = "feedback-msg msg-correct";
+                msgEl.innerText = `🎉 ${validation.msg} (+${pointsGained}分${streakMsg})`;
+                document.getElementById('btnSubmit').disabled = true;
+
+                gameHistory.push({
+                    level: currentLevel,
+                    qText: getQuestionText(),
+                    firstAns: currentFirstAnswerText,
+                    correctAns: formatFractionText(currentQuestion.target.w, currentQuestion.target.n, currentQuestion.target.d),
+                    isFirstTry: isFirstAttempt
+                });
+
+                if (isFirstAttempt) {
+                    levelFirstTryCount++;
+                }
+
+                updateHeader();
+
+                setTimeout(() => {
+                    if (levelFirstTryCount >= levelGoal) {
+                        showLevelSummary();
+                    } else {
+                        nextQuestion();
+                    }
+                }, 1200);
+
+            } else {
+                streakCount = 0;
+                totalScore = Math.max(0, totalScore - 10);
+
+                msgEl.className = "feedback-msg msg-wrong";
+                msgEl.innerText = `❌ ${validation.msg} (-10分)`;
+
+                if (isFirstAttempt) {
+                    levelPenalties++;
+                    levelGoal++;
+                    isFirstAttempt = false;
+                }
+                updateHeader();
+            }
+        }
+
+        function validateAnswer(w, n, d, target) {
+            if (n > 0 && d === 0) return { valid: false, msg: "有填寫分子時，分母不能為 0！" };
+            if (n === 0 && d > 0) return { valid: false, msg: "有填寫分母時，分子不能為 0！" };
+            if (d > 0 && n >= d) return { valid: false, msg: "分子大於或等於分母，請將假分數化為帶分數進位！" };
+            if (n > 0 && d > 0 && gcd(n, d) > 1) return { valid: false, msg: "分數尚未約至最簡喔！請再約簡一下。" };
+
+            if (w === target.w && n === target.n && d === target.d) {
+                return { valid: true, msg: "完全正確！" };
+            } else {
+                return { valid: false, msg: "答案不太對喔，請再檢查計算與約簡！" };
+            }
+        }
+
+        function showLevelSummary() {
+            document.getElementById('levelModalTitle').innerText = `🎉 關卡 ${currentLevel} 完成！`;
+            document.getElementById('lmFirstTry').innerText = levelFirstTryCount;
+            document.getElementById('lmPenalties').innerText = levelPenalties;
+            document.getElementById('lmTotalScore').innerText = totalScore;
+
+            let nextBtn = document.getElementById('btnNextLevel');
+            if (currentLevel >= 4 && gameMode === 'full') {
+                nextBtn.innerText = "查看全關總結算";
+                nextBtn.style.display = "inline-block";
+            } else if (currentLevel >= 4 && gameMode === 'single') {
+                nextBtn.style.display = "none";
+            } else {
+                nextBtn.innerText = "進入下一關";
+                nextBtn.style.display = "inline-block";
+            }
+
+            document.getElementById('levelModal').classList.add('active');
+        }
+
+        function nextLevel() {
+            document.getElementById('levelModal').classList.remove('active');
+            if (currentLevel < 4) {
+                startLevel(currentLevel + 1);
+            } else {
+                if (gameMode === 'full') {
+                    showFinalSummary();
+                } else {
+                    openStartModal();
+                }
+            }
+        }
+
+        function showFinalSummary() {
+            stopTimer();
+
+            let totalFirstTry = gameHistory.filter(h => h.isFirstTry).length;
+            let totalPenalties = gameHistory.filter(h => !h.isFirstTry).length;
+
+            document.getElementById('fmTotalFirstTry').innerText = totalFirstTry;
+            document.getElementById('fmTotalPenalties').innerText = totalPenalties;
+            document.getElementById('fmTotalTime').innerText = getFormattedTimeStr();
+            document.getElementById('fmFinalScore').innerText = totalScore;
+
+            let tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            gameHistory.forEach(item => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>關卡 ${item.level}</td>
+                    <td>${item.qText}</td>
+                    <td>${item.firstAns}</td>
+                    <td><strong>${item.correctAns}</strong></td>
+                    <td>
+                        <span class="${item.isFirstTry ? 'badge-success' : 'badge-retry'}">
+                            ${item.isFirstTry ? '一次答對' : '經修正答對'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('finalModal').classList.add('active');
+        }
+
+        window.onload = openStartModal;
+    </script>
+</body>
+</html>
